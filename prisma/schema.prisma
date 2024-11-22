@@ -26,6 +26,8 @@ model Product {
   productCategoryId Int
   productCategory   ProductCategory @relation(fields: [productCategoryId], references: [id])
   orderProduct      OrderProduct[]
+
+  @@map("product")
 }
 
 model ProductImage {
@@ -33,6 +35,8 @@ model ProductImage {
   url       String
   productId Int
   product   Product @relation(fields: [productId], references: [id])
+
+  @@map("productimage")
 }
 
 model ProductCategory {
@@ -41,6 +45,8 @@ model ProductCategory {
   image      String
   imageHover String
   ProductId  Product[]
+
+  @@map("productcategory")
 }
 
 model OrderProduct {
@@ -50,6 +56,8 @@ model OrderProduct {
   product   Product @relation(fields: [productId], references: [id])
   orderId   Int
   order     Order   @relation(fields: [orderId], references: [id])
+
+  @@map("orderproduct")
 }
 
 model Order {
@@ -60,6 +68,8 @@ model Order {
   userId         Int
   user           User           @relation(fields: [userId], references: [id])
   payment        Payment?
+
+  @@map("order")
 }
 
 model Payment {
@@ -72,6 +82,8 @@ model Payment {
   trackingShipment TrackingShipment?
   statuspayment    StatusPayment     @default(WAITING_PAY)
   slipUrl          String
+
+  @@map("payment")
 }
 
 enum StatusPayment {
@@ -86,6 +98,8 @@ model PaymentMethod {
   bankAccount       String
   pictureQr         String
   bankAccountNumber String
+
+  @@map("paymentmethod")
 }
 
 model User {
@@ -97,6 +111,8 @@ model User {
   address          Address[]
   order            Order[]
   trackingShipment TrackingShipment[]
+
+  @@map("user")
 }
 
 enum Role {
@@ -116,6 +132,8 @@ model Address {
   postal      String
   userId      Int    @unique
   user        User   @relation(fields: [userId], references: [id])
+
+  @@map("address")
 }
 
 //ใช้ยิง api ไปไปรษณีย์
@@ -126,4 +144,6 @@ model TrackingShipment {
   payment    Payment @relation(fields: [paymentId], references: [id])
   userId     Int
   user       User    @relation(fields: [userId], references: [id])
+
+  @@map("trackingshipment")
 }
