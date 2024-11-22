@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                Int             @id @default(autoincrement())
+  name              String
+  player_min        Int
+  player_max        Int
+  time              Int
+  price             Int
+  stock             Int
+  detail            String
+  productImage      ProductImage[]
+  productCategoryId Int
+  productCategory   ProductCategory @relation(fields: [productCategoryId], references: [id])
+  orderProduct      OrderProduct[]
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model ProductCategory {
+  id         Int       @id @default(autoincrement())
+  name       String
+  image      String
+  imageHover String
+  ProductId  Product[]
+}
+
+model OrderProduct {
+  id        Int     @id @default(autoincrement())
+  quantity  Int
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+}
+
+model Order {
+  id             Int            @id @default(autoincrement())
+  totalPrice     Int
+  createAt       DateTime       @default(now())
+  orderProductId OrderProduct[]
+  userId         Int
+  user           User           @relation(fields: [userId], references: [id])
+  payment        Payment?
+}
+
+model Payment {
+  id               Int               @id @default(autoincrement())
+  isPaid           Boolean           @default(false)
+  slipUploadAt     DateTime          @default(now())
+  slipConfirm      Boolean           @default(false)
+  orderId          Int               @unique
+  order            Order             @relation(fields: [orderId], references: [id])
+  trackingShipment TrackingShipment?
+  statuspayment    StatusPayment     @default(WAITING_PAY)
+  slipUrl          String
+}
+
+enum StatusPayment {
+  WAITING_PAY
+  PENDING
+  REJECT
+  SEND
+}
+
+model PaymentMethod {
+  id                Int    @id @default(autoincrement())
+  bankAccount       String
+  pictureQr         String
+  bankAccountNumber String
+}
+
+model User {
+  id               Int                @id @default(autoincrement())
+  userName         String             @unique
+  email            String             @unique
+  password         String
+  role             Role               @default(USER)
+  address          Address[]
+  order            Order[]
+  trackingShipment TrackingShipment[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Address {
+  id          Int    @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  phone       String @unique
+  addressHome String
+  subDistrict String
+  district    String
+  province    String
+  postal      String
+  userId      Int    @unique
+  user        User   @relation(fields: [userId], references: [id])
+}
+
+//ใช้ยิง api ไปไปรษณีย์
+model TrackingShipment {
+  id         Int     @id @default(autoincrement())
+  trackingId String
+  paymentId  Int     @unique
+  payment    Payment @relation(fields: [paymentId], references: [id])
+  userId     Int
+  user       User    @relation(fields: [userId], references: [id])
+}
